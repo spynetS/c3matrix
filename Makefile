@@ -5,10 +5,11 @@
 # @version 0.1
 
 CC = c3c
+CFLAGS =
 FILES = ./printer.c3 ./main.c3
 
 all:
-	$(CC) compile $(FILES)
+	$(CC) $(CFLAGS) compile $(FILES)
 
 run: all
 	./c3matrix

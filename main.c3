@@ -3,6 +3,7 @@ import std::io;
 import std::thread;
 import libc;
 import std::core::mem;
+import std::os::process;
 
 
 /*
@@ -22,7 +23,6 @@ fn char get_random_char(){
     char[] charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*().,";
     int index = libc::rand() % (73 - 1); // Random index in the range of the charset
     return charset[index];
-
 }
 
 fn int get_ttl(int max){
@@ -80,11 +80,23 @@ fn void Column.free(Column* this){
     free(this);
 }
 
+
+fn void sig(){
+    io::printf("");
+}
+def TestFn = fn void(int);
+fn void test(int x)
+{
+   libc::write(1, "Alarm triggered!\n", 17);
+}
+extern fn uint alarm (uint __seconds);
+extern fn int getchar ();
+
 fn int main(int argc, char** argv){
 
-    int w,h;
-    libc::scanf("%d %d", &h, &w);
-
+    int[<2>] size = term_size()!!;
+    int w = size.x-10;
+    int h = size.y;
 
     Window *win = new_window({0,0}, {w,h});
     win.start();
@@ -101,7 +113,7 @@ fn int main(int argc, char** argv){
                 columns[j].update(win);
             }
         }
-        if(i++>100) break;
+        if(i++>10000) break;
     }
 
     for(int j = 0; j < w; j ++){

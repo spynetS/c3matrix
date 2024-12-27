@@ -76,3 +76,27 @@ fn void Window.end(Window *this){
     echo(true);
     cursor(true);
 }
+
+extern fn int ioctl(int fd, int request, void* argv);
+const int TIOCGWINSZ = 0x5413; // Request code for terminal size
+const int STDOUT_FILENO = 1;   // File descriptor for stdout
+
+struct Winsize {
+		ushort ws_row;    // Number of rows
+		ushort ws_col;    // Number of columns
+		ushort ws_xpixel; // Unused in this example
+		ushort ws_ypixel; // Unused in this example
+}
+
+fn int[<2>]! term_size(){
+		Winsize size;
+		if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &size) == -1) {
+			return IoError.FILE_NOT_FOUND?;
+		}
+		return {size.ws_col,size.ws_row};
+}
+
+
+fn char getch(){
+		return 0;
+}
