@@ -6,14 +6,6 @@ import std::core::mem;
 import std::os::process;
 
 
-/*
-If i have a list of columns where each column has a struct
-of a char and its ttl. Each frame we check if a structs ttl
-is at end and we remove it. The cursor for the column
-goes upp and down adding new chars.
-
-*/
-
 struct Item{
     int pos;
     int ttl;
