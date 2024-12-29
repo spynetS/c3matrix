@@ -2,6 +2,7 @@ module c3matrix;
 import std::io;
 import std::core::mem;
 import std::collections;
+import std::thread;
 
 import libc;
 
@@ -96,7 +97,4 @@ fn int[<2>]! term_size(){
 		return {size.ws_col,size.ws_row};
 }
 
-
-fn char getch(){
-		return 0;
-}
+extern fn char getKeyPressed();

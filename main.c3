@@ -76,11 +76,7 @@ fn void Column.free(Column* this){
 fn void sig(){
     io::printf("");
 }
-def TestFn = fn void(int);
-fn void test(int x)
-{
-   libc::write(1, "Alarm triggered!\n", 17);
-}
+
 extern fn uint alarm (uint __seconds);
 extern fn int getchar ();
 
@@ -98,8 +94,11 @@ fn int main(int argc, char** argv){
         columns[i] = new_column(i*2,h);
     }
 
+
     int i = 0;
     while(true){
+        char key = getKeyPressed();
+        if(key == 'q') break;
         if(try thread::sleep_ms(50)){
             for(int j = 0; j < w; j ++){
                 columns[j].update(win);
