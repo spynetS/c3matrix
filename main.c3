@@ -62,7 +62,7 @@ fn Column *new_column(int x, int height){
     Column *c = malloc(Column.sizeof);
     c.x = x;
     c.height = height;
-    c.count_down = libc::rand() % height;
+    c.count_down = libc::rand() % height*2;
     c.ints = malloc(int.sizeof*height);
     for(int i = 0; i <  height; i ++) c.ints[i] = -1;
     return c;
@@ -76,7 +76,7 @@ fn void Column.free(Column* this){
 fn int main(int argc, char** argv){
 
     int[<2>] size = c3curses::term_size()!!;
-    int w = size.x-10;
+    int w = size.x;
     int h = size.y;
 
     Window *win = c3curses::new_window({0,0}, {w,h});
@@ -90,10 +90,11 @@ fn int main(int argc, char** argv){
     while(true){
         char key = c3curses::getKeyPressed();
         if(key == 'q') break;
-        c3curses::sleep(50)!!;
+        c3curses::sleep(45)!!;
         for(int j = 0; j < w; j ++){
             columns[j].update(win);
         }
+        // win.box("-","|");
         win.refresh();
     }
 

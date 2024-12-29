@@ -34,6 +34,7 @@ fn void Window.mvprint(Window* this, int[<2>] pos, String pixel){
   libc::sprintf(this.buffer,"%s\e[%d;%dH%s%s",this.buffer, pos.y, pos.x,this.current_color,pixel);
 }
 fn void Window.mvprintchar(Window* this, int[<2>] pos, char pixel){
+	if(pos.x > this.res.x || pos.x < 0 || pos.y > this.res.y || pos.y < 0) return;
 	pos += this.pos;
 	libc::sprintf(this.buffer,"%s\e[%d;%dH%s%c",this.buffer, pos.y, pos.x,this.current_color,pixel);
 }
