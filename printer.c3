@@ -1,4 +1,5 @@
-module c3matrix;
+module c3curses;
+
 import std::io;
 import std::core::mem;
 import std::collections;
@@ -10,6 +11,7 @@ struct Window{
 	int[<2>] pos;
  	int[<2>] res;
 	ZString current_color;
+ ZString buffer;
 }
 
 fn Window* new_window(int[<2>] pos, int[<2>] res){
@@ -17,6 +19,7 @@ fn Window* new_window(int[<2>] pos, int[<2>] res){
  window.pos = pos;
  window.res = res;
  window.current_color = (ZString) malloc(char.sizeof*10);
+ window.buffer = (ZString) malloc(char.sizeof*20*res.x*res.y);
 
  	return window;
 }
@@ -25,13 +28,18 @@ fn void Window.setColor(Window* this,ZString color){
 	libc::strcpy(this.current_color,color);
 }
 
-fn void Window.mvprint(Window* this, int x,  int y, String pixel){
-	io::printfn("\e[%d;%dH%s%s", this.pos.y+y, this.pos.x+x,this.current_color,pixel);
+fn void Window.mvprint(Window* this, int[<2>] pos, String pixel){
+	if(pos.x > this.res.x || pos.x < 0 || pos.y > this.res.y || pos.y < 0) return;
+ 	pos += this.pos;
+  libc::sprintf(this.buffer,"%s\e[%d;%dH%s%s",this.buffer, pos.y, pos.x,this.current_color,pixel);
 }
-fn void Window.mvprintchar(Window* this, int x,  int y, char pixel){
-	io::printfn("\e[%d;%dH%s%c", this.pos.y+y, this.pos.x+x,this.current_color,pixel);
+fn void Window.mvprintchar(Window* this, int[<2>] pos, char pixel){
+	pos += this.pos;
+	libc::sprintf(this.buffer,"%s\e[%d;%dH%s%c",this.buffer, pos.y, pos.x,this.current_color,pixel);
 }
-
+fn void mvcursor(int[<2>] pos){
+	io::printfn("\e[%d;%dH%",pos.y,pos.x);
+}
 fn void clear(){
 	io::printfn("\e[2J");
 }
@@ -52,19 +60,24 @@ fn void cursor(bool on){
   }
 }
 
-fn void Window.box(Window* this){
-	for(int i = 0; i <= this.res.y; i ++){
-	  	this.mvprint(0,i,"#");
-	  	this.mvprint(this.res.x,i,"#");
+fn void Window.box(Window* this,String hor, String vert){
+		for(int i = 1; i < this.res.y; i ++){
+	  	this.mvprint({0,i},vert);
+	  	this.mvprint({this.res.x,i},vert);
 	}
-	for(int i = 0; i <= this.res.x; i ++){
-	  	this.mvprint(i,0,"#");
-	  	this.mvprint(i,this.res.y,"#");
+	for(int i = 1; i < this.res.x; i ++){
+	  	this.mvprint({i,0},hor);
+	  	this.mvprint({i,this.res.y},hor);
 	}
+	this.mvprint({0,0},"┌");
+	this.mvprint({0,this.res.y},"└");
+	this.mvprint({this.res.x,0},"┐");
+	this.mvprint({this.res.x,this.res.y},"┘");
 }
 
 fn void Window.free(Window* window){
 	free(window.current_color);
+	free(window.buffer);
 	free(window);
 }
 
@@ -95,6 +108,15 @@ fn int[<2>]! term_size(){
 			return IoError.FILE_NOT_FOUND?;
 		}
 		return {size.ws_col,size.ws_row};
+}
+
+fn void! sleep(ulong ms){
+	thread::sleep_ms(ms);
+}
+
+fn void Window.refresh(&window){
+	io::printfn("%s",window.buffer);
+	libc::sprintf(window.buffer,"");
 }
 
 extern fn char getKeyPressed();

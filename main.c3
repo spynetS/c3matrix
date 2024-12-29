@@ -4,6 +4,7 @@ import std::thread;
 import libc;
 import std::core::mem;
 import std::os::process;
+import c3curses;
 
 
 struct Item{
@@ -36,18 +37,18 @@ fn void Column.update(Column* this, Window* win){
     if(this.cursor == 0) this.ttl = get_ttl(this.height-4);
 
     win.setColor("\e[32m");
-    win.mvprintchar(this.x,this.cursor,this.cursor_char);
+    win.mvprintchar({this.x,this.cursor},this.cursor_char);
     this.cursor_char = get_random_char();
 
     this.cursor = (this.cursor + 1) % this.height;
     this.ints[this.cursor] = this.ttl;
     win.setColor("\e[1;33m");
-    win.mvprintchar(this.x,this.cursor,this.cursor_char);
+    win.mvprintchar({this.x,this.cursor},this.cursor_char);
 
     for(int i = 0; i < this.height; i ++){
         int item = this.ints[i];
         if(item == 0){
-            win.mvprintchar(this.x,i,' ');
+            win.mvprintchar({this.x,i},' ');
             this.ints[i] = -1;
         }
         else if (item > 0){
@@ -72,21 +73,13 @@ fn void Column.free(Column* this){
     free(this);
 }
 
-
-fn void sig(){
-    io::printf("");
-}
-
-extern fn uint alarm (uint __seconds);
-extern fn int getchar ();
-
 fn int main(int argc, char** argv){
 
-    int[<2>] size = term_size()!!;
+    int[<2>] size = c3curses::term_size()!!;
     int w = size.x-10;
     int h = size.y;
 
-    Window *win = new_window({0,0}, {w,h});
+    Window *win = c3curses::new_window({0,0}, {w,h});
     win.start();
 
     Column** columns = malloc((Column*).sizeof*w);
@@ -95,12 +88,12 @@ fn int main(int argc, char** argv){
     }
 
     while(true){
-        char key = getKeyPressed();
+        char key = c3curses::getKeyPressed();
         if(key == 'q') break;
-        if(try thread::sleep_ms(50)){
-            for(int j = 0; j < w; j ++){
-                columns[j].update(win);
-            }
+        c3curses::sleep(50)!!;
+        for(int j = 0; j < w; j ++){
+            columns[j].update(win);
+            win.refresh();
         }
     }
 
