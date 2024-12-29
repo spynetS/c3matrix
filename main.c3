@@ -81,8 +81,8 @@ fn int main(int argc, char** argv){
   for(int i = 0; i < argc; i ++){
     String s = ((ZString) argv[i]).str_view();
     switch(s){
-      case "--speed":
-      case "-s":
+      case "--delay":
+      case "-d":
         delay = ((ZString) argv[i+1]).str_view().to_int()!!;
         break;
       case "--no-clear":
@@ -92,7 +92,7 @@ fn int main(int argc, char** argv){
       case "-h":
         io::printn("This is a port of cmatrix written in c3 (and some c) using escape codes to manipulate cursor");
         io::printn("c3matrix <options>");
-        io::printn("-s  --speed  <int> :  Choose the delay in ms for each frame");
+        io::printn("-d  --delay  <int> :  Choose the delay in ms for each frame");
         io::printn("    --no-clear     :  Will not clear the terminal before starting");
         return 0;
     }

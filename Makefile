@@ -7,6 +7,7 @@
 OUT_DIR = ./build
 EXEC_NAME = c3matrix
 EXEC = $(OUT_DIR)/$(EXEC_NAME)
+DEST_DIR ?= /usr/local/bin
 
 CC = c3c
 CFLAGS = -L $(OUT_DIR) -l keypress
@@ -30,7 +31,12 @@ run: $(EXEC)
 	$(EXEC)
 
 install: $(EXEC)
-	install -s --mode +x $(EXEC) /usr/local/bin/$(EXEC_NAME)
+	sudo install -s --mode +x $(EXEC) $(DEST_DIR)/$(EXEC_NAME)
+	@echo "Installation complete."
+
+uninstall:
+	sudo rm -rf $(DEST_DIR)/$(EXEC_NAME)
+	@echo "Uninstallation complete."
 
 clean:
 	rm -rf $(OUT_DIR)
