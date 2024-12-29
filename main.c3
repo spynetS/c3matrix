@@ -36,7 +36,7 @@ fn void Column.update(Column* this, Window* win){
     if(--this.count_down > 0) return;
     if(this.cursor == 0) this.ttl = get_ttl(this.height-4);
 
-    win.setColor("\e[32m");
+  win.setColor("\e[0;32m");
     win.mvprintchar({this.x,this.cursor},this.cursor_char);
     this.cursor_char = get_random_char();
 
@@ -143,8 +143,8 @@ fn int main(int argc, char** argv){
     win.end();
 
     win.free();
-    // c3curses::mvcursor({0,0});
-    // c3curses::clear();
+    c3curses::mvcursor({0,0});
+    c3curses::clear();
 
 
 
