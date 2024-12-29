@@ -12,7 +12,7 @@ CFLAGS = -L $(OUT_DIR) -l keypress
 FILES = ./printer.c3 ./main.c3
 
 
-all: keypress
+all: keypress $(FILES)
 	$(CC) $(CFLAGS) compile $(FILES) -o $(EXEC)
 
 $(OUT_DIR):

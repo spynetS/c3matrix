@@ -8,8 +8,8 @@ import libc;
 
 struct Window{
 	int[<2>] pos;
- int[<2>] res;
- ZString current_color;
+ 	int[<2>] res;
+	ZString current_color;
 }
 
 fn Window* new_window(int[<2>] pos, int[<2>] res){

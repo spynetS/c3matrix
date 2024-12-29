@@ -94,8 +94,6 @@ fn int main(int argc, char** argv){
         columns[i] = new_column(i*2,h);
     }
 
-
-    int i = 0;
     while(true){
         char key = getKeyPressed();
         if(key == 'q') break;
@@ -104,7 +102,6 @@ fn int main(int argc, char** argv){
                 columns[j].update(win);
             }
         }
-        if(i++>10000) break;
     }
 
     for(int j = 0; j < w; j ++){
