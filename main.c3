@@ -42,7 +42,7 @@ fn void Column.update(Column* this, Window* win){
 
     this.cursor = (this.cursor + 1) % this.height;
     this.ints[this.cursor] = this.ttl;
-    win.setColor("\e[1;33m");
+    win.setColor("\e[1;37m");
     win.mvprintchar({this.x,this.cursor},this.cursor_char);
 
     for(int i = 0; i < this.height; i ++){
@@ -75,22 +75,60 @@ fn void Column.free(Column* this){
 
 fn int main(int argc, char** argv){
 
+  int delay = 45;
+  bool clear = true;
+
+  for(int i = 0; i < argc; i ++){
+    String s = ((ZString) argv[i]).str_view();
+    switch(s){
+      case "--speed":
+      case "-s":
+        delay = ((ZString) argv[i+1]).str_view().to_int()!!;
+        break;
+      case "--no-clear":
+        clear = false;
+        break;
+      case "--help":
+      case "-h":
+        io::printn("This is a port of cmatrix written in c3 (and some c) using escape codes to manipulate cursor");
+        io::printn("c3matrix <options>");
+        io::printn("-s  --speed  <int> :  Choose the delay in ms for each frame");
+        io::printn("    --no-clear     :  Will not clear the terminal before starting");
+        return 0;
+    }
+
+  }
+
+
+
     int[<2>] size = c3curses::term_size()!!;
     int w = size.x;
     int h = size.y;
 
     Window *win = c3curses::new_window({0,0}, {w,h});
-    win.start();
+    if(clear) c3curses::clear();
+  c3curses::echo(false);
+  c3curses::cursor(false);
 
     Column** columns = malloc((Column*).sizeof*w);
     for(int i = 0; i < w; i ++){
         columns[i] = new_column(i*2,h);
     }
 
+
+
     while(true){
         char key = c3curses::getKeyPressed();
         if(key == 'q') break;
-        c3curses::sleep(45)!!;
+        if(key == 'p') {
+            win.mvprint({size.x/2-11,size.y/2},"Press enter to unpause");
+            win.refresh();
+          char val = (char) libc::getchar();
+          if(val == 'q') break;
+            win.mvprint({size.x/2-11,size.y/2},"                      ");
+        }
+
+        c3curses::sleep(delay)!!;
         for(int j = 0; j < w; j ++){
             columns[j].update(win);
         }
@@ -103,7 +141,12 @@ fn int main(int argc, char** argv){
     }
     free(columns);
     win.end();
+
     win.free();
+    // c3curses::mvcursor({0,0});
+    // c3curses::clear();
+
+
 
     return 0;
 }
