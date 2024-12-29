@@ -93,8 +93,8 @@ fn int main(int argc, char** argv){
         c3curses::sleep(50)!!;
         for(int j = 0; j < w; j ++){
             columns[j].update(win);
-            win.refresh();
         }
+        win.refresh();
     }
 
     for(int j = 0; j < w; j ++){
