@@ -1,8 +1,5 @@
-#include <stdlib.h>
 #include <stdio.h>
 #include <termios.h>
-#include <errno.h>
-#include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>

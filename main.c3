@@ -62,6 +62,7 @@ fn Column *new_column(int x, int height){
     Column *c = malloc(Column.sizeof);
     c.x = x;
     c.height = height;
+    c.cursor = 0;
     c.count_down = libc::rand() % height*2;
     c.ints = malloc(int.sizeof*height);
     for(int i = 0; i <  height; i ++) c.ints[i] = -1;
@@ -71,6 +72,13 @@ fn Column *new_column(int x, int height){
 fn void Column.free(Column* this){
     free(this.ints);
     free(this);
+}
+
+fn void free_columns(Column **columns,int w){
+    for(int j = 0; j < w; j ++){
+        columns[j].free();
+    }
+    free(columns);
 }
 
 fn int main(int argc, char** argv){
@@ -107,14 +115,14 @@ fn int main(int argc, char** argv){
 
     Window *win = c3curses::new_window({0,0}, {w,h});
     if(clear) c3curses::clear();
-  c3curses::echo(false);
-  c3curses::cursor(false);
+    c3curses::echo(false);
+    c3curses::cursor(false);
 
-    Column** columns = malloc((Column*).sizeof*w);
+
+    Column** columns = malloc(Column*.sizeof*w);
     for(int i = 0; i < w; i ++){
         columns[i] = new_column(i*2,h);
     }
-
 
 
     while(true){
@@ -123,30 +131,47 @@ fn int main(int argc, char** argv){
         if(key == 'p') {
             win.mvprint({size.x/2-11,size.y/2},"Press enter to unpause");
             win.refresh();
-          char val = (char) libc::getchar();
-          if(val == 'q') break;
-            win.mvprint({size.x/2-11,size.y/2},"                      ");
+            char val = (char) libc::getchar();
+            if(val == 'q') break;
+                win.mvprint({size.x/2-11,size.y/2},"                      ");
+        }
+        //generate new columns and window based on the new size
+        if(c3curses::term_size()!!!=size) {
+
+            free_columns(columns,w);
+
+            size = c3curses::term_size()!!;
+            w = size.x;
+            h = size.y;
+
+            //create new columns based on the new size
+            columns = malloc((Column*).sizeof*w);
+            for(int i = 0; i < w; i ++){
+                columns[i] = new_column(i*2,h);
+            }
+
+            //generate new window and clear the screen
+            win.free();
+            win = c3curses::new_window({0,0}, {w,h});
+            c3curses::mvcursor({0,0});
+            c3curses::clear();
+            continue;
+
         }
 
         c3curses::sleep(delay)!!;
         for(int j = 0; j < w; j ++){
             columns[j].update(win);
         }
-        // win.box("-","|");
         win.refresh();
     }
+    free_columns(columns,w);
 
-    for(int j = 0; j < w; j ++){
-        columns[j].free();
-    }
-    free(columns);
     win.end();
 
     win.free();
     c3curses::mvcursor({0,0});
     c3curses::clear();
-
-
 
     return 0;
 }
