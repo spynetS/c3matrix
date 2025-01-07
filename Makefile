@@ -11,7 +11,7 @@ DEST_DIR ?= /usr/local/bin
 
 CC = c3c
 CFLAGS = -L $(OUT_DIR) -l keypress
-FILES = ./printer.c3 ./main.c3
+FILES = ./main.c3 ./printer.c3
 
 
 $(EXEC): $(FILES) $(OUT_DIR)/keypress.o

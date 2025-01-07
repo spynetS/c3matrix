@@ -1,4 +1,5 @@
 module c3matrix;
+
 import std::io;
 import std::thread;
 import libc;
